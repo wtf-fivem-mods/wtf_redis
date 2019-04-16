@@ -3541,7 +3541,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var redis = new ioredis__WEBPACK_IMPORTED_MODULE_0___default.a() // todo: add convar support for custom server params
 
-global.onNet('wtf_redis:call', (ev, id, cmd, ...args) => {
+global.onNet('wtf_redis:call', (ev, id, cmd, args) => {
     let source = global.source // provided by FiveM to scope response to appropriate client
     redis[cmd](...args, (err, res) =>
         setTimeout(() => global.emitNet(ev, source, id, err || false, res), 0)

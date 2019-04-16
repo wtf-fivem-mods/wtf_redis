@@ -6,19 +6,15 @@ Redis = {} -- see setmetatable below
 -- local ev = string.format('wtf_redis:ns_%s', ns)
 local ev = 'wtf_redis:response'
 
-local function abl(a, ...)
-    local n = select('#', ...)
-    if n == 0 then return nil end
-    if n == 1 then return a end
-    return a, abl(...)
-end
-
 -- send to server
 local function redis(cmd, ...)
-    local cb = select(select('#', ...), ...)
+    local args = {...}
     local id = GetRandomIntInRange(2^32)
-    cbs[id] = cb
-    TriggerServerEvent('wtf_redis:call', ev, id, cmd, abl(...))
+    if type(args[#args]) == 'function' then
+        cbs[id] = args[#args]
+        args[#args] = nil
+    end
+    TriggerServerEvent('wtf_redis:call', ev, id, cmd, args)
 end
 
 -- response from server
