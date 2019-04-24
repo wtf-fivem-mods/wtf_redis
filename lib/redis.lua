@@ -29,6 +29,19 @@ AddEventHandler(EV, function(id, err, res)
     end
 end)
 
+function _makeKeyFn(keyRoot)
+    return function(...)
+        local args = {...}
+        if #args > 0 then
+            s = ":"..args[1]
+            for i=2, #args do
+                s = s ..":".. args[i]
+            end
+        end
+        return keyRoot..s
+    end
+end
+
 local _memoize -- see setmetatable below
 
 -- metatable to handle Redis.<cmd>
@@ -38,6 +51,8 @@ setmetatable(Redis, {
             if cmd == 'memoize' then
                 _memoize.ival = select('1', ...) or 100
                 return _memoize
+            elseif cmd == 'makeKeyFn' then
+                return _makeKeyFn(...)
             end
             return redis(cmd, ...)
         end
