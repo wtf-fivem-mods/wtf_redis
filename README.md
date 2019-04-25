@@ -1,10 +1,6 @@
 # wtf_redis
 Redis client for FiveM
 
-| WARNING: Work in progress! |
-| --- |
-
-
 ## Goals
 
 - **Client side API**
