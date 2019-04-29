@@ -3539,14 +3539,23 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var ioredis__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(ioredis__WEBPACK_IMPORTED_MODULE_0__);
 
 
-var redis = new ioredis__WEBPACK_IMPORTED_MODULE_0___default.a() // todo: add convar support for custom server params
+var redis = new ioredis__WEBPACK_IMPORTED_MODULE_0___default.a(); // todo: add convar support for custom server params
 
-global.onNet('wtf_redis:call', (ev, id, cmd, args) => {
-    let source = global.source // provided by FiveM to scope response to appropriate client
-    redis[cmd](...args, (err, res) =>
-        setTimeout(() => global.emitNet(ev, source, id, err || false, res), 0)
-    )
-})
+global.onNet("wtf_redis:call", async (ev, id, cmd, args) => {
+  let source = global.source;
+  const sendResponse = (res, err) => {
+    setImmediate(() =>
+      global.TriggerClientEvent(ev, source, id, err || false, res)
+    );
+  };
+  try {
+    const res = await redis[cmd](...args);
+    sendResponse(res, null);
+  } catch (err) {
+    sendResponse(null, err);
+  }
+});
+
 
 /***/ }),
 /* 27 */

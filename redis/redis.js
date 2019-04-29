@@ -1,10 +1,18 @@
-import Redis from 'ioredis'
+import Redis from "ioredis";
 
-var redis = new Redis() // todo: add convar support for custom server params
+var redis = new Redis(); // todo: add convar support for custom server params
 
-global.onNet('wtf_redis:call', (ev, id, cmd, args) => {
-    let source = global.source // provided by FiveM to scope response to appropriate client
-    redis[cmd](...args, (err, res) =>
-        setTimeout(() => global.emitNet(ev, source, id, err || false, res), 0)
-    )
-})
+global.onNet("wtf_redis:call", async (ev, id, cmd, args) => {
+  let source = global.source;
+  const sendResponse = (res, err) => {
+    setImmediate(() =>
+      global.TriggerClientEvent(ev, source, id, err || false, res)
+    );
+  };
+  try {
+    const res = await redis[cmd](...args);
+    sendResponse(res, null);
+  } catch (err) {
+    sendResponse(null, err);
+  }
+});
